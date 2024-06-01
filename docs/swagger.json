@@ -1,0 +1,329 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Eigen - Backend Test Case",
+    "description": "Created by Rangga Adi Pratama, the creds are username: 'admin' and password: '12345678'",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8000",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "authentication"
+    },
+    {
+      "name": "book",
+      "description": "book modules, log in required"
+    },
+    {
+      "name": "member",
+      "description": "member modules, log in required"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "to log in a user",
+        "description": "to log in a user, requires a valid username and password",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The username and password to log in",
+            "schema": {
+              "type": "object",
+              "required": [
+                "username",
+                "password"
+              ],
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "admin"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "12345678"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login success"
+          },
+          "400": {
+            "description": "either invalid username, password or user creds"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          }
+        ],
+        "security": {
+          "bearerAuth": []
+        },
+        "summary": "to log out a user",
+        "description": "to log out a user",
+        "responses": {
+          "200": {
+            "description": "logout success"
+          },
+          "400": {
+            "description": "error"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "to refresh one's token",
+        "description": "to refresh one's token, requires a refresh token",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The token required",
+            "schema": {
+              "type": "object",
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "0c15754d87b27ad804c1f487585573b4e122aa33d4f4435707db8c7d1eb63294bd3a344d74551d1a"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token refresh success"
+          },
+          "400": {
+            "description": "error like wrong token or it's expired"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    },
+    "/books": {
+      "get": {
+        "tags": [
+          "book"
+        ],
+        "summary": "retrieve book list",
+        "description": "retrieve book list, excluding the borrowed one",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "book list retrieved"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    },
+    "/books/borrow": {
+      "post": {
+        "tags": [
+          "book"
+        ],
+        "summary": "initiate borrowing transaction",
+        "description": "initiate borrowing transaction, including some validation to check if the member may borrow or not",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "member and book",
+            "schema": {
+              "type": "object",
+              "required": [
+                "member",
+                "book"
+              ],
+              "properties": {
+                "member": {
+                  "type": "string",
+                  "example": "665a1646d21e4dfb433cd44d"
+                },
+                "book": {
+                  "type": "array",
+                  "example": [
+                    "665a1645d21e4dfb433cd445",
+                    "665a1644d21e4dfb433cd443"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "borrowing success"
+          },
+          "400": {
+            "description": "error validation"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    },
+    "/books/return": {
+      "post": {
+        "tags": [
+          "book"
+        ],
+        "summary": "initiate return transaction",
+        "description": "initiate return transaction, user will be penalized for 3 days if it's past overdue date",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "member and book",
+            "schema": {
+              "type": "object",
+              "required": [
+                "member",
+                "book"
+              ],
+              "properties": {
+                "member": {
+                  "type": "string",
+                  "example": "665a1646d21e4dfb433cd44d"
+                },
+                "book": {
+                  "type": "string",
+                  "example": "665a1645d21e4dfb433cd445"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "borrowing success"
+          },
+          "400": {
+            "description": "error validation"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    },
+    "/members": {
+      "get": {
+        "tags": [
+          "member"
+        ],
+        "summary": "retrieve member list",
+        "description": "retrieve member list, including how many books they are borrowing. It will refresh member penalized status",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token to authorize",
+            "schema": {
+              "type": "string",
+              "example": "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTllNjNiZmQ4ZjY4MWM5MDAxOTQ2NCIsImlhdCI6MTcxNzE3NDQ4MiwiZXhwIjoxNzQ4NzEwNDgyfQ.sFMy835DXgdjLL9g9TLhhLu_HPmpNDinEMdWhwoL_0Y",
+              "required": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "member list retrieved"
+          },
+          "401": {
+            "description": "wrong bearer key or Unauthenticated"
+          }
+        }
+      }
+    }
+  }
+}
